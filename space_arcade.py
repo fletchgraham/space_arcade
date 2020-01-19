@@ -3,7 +3,7 @@ import random
 
 WIDTH = 800
 HEIGHT = 800
-TITLE = 'Arcade Tutorial'
+TITLE = 'Space Arcade'
 SCALE = .2
 
 class TutorialWindow(arcade.Window):
