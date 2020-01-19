@@ -2,7 +2,7 @@ import arcade
 import random
 
 WIDTH = 800
-HEIGHT = 600
+HEIGHT = 800
 TITLE = 'Arcade Tutorial'
 SCALE = .2
 
