@@ -14,8 +14,10 @@ class TutorialWindow(arcade.Window):
         self.enemies_list = arcade.SpriteList()
         self.asteroids_list = arcade.SpriteList()
         self.all_sprites = arcade.SpriteList()
+        self.alive = True
+        self.paused = False
+        self.score = 0
         self.setup()
-
 
     def setup(self):
         arcade.set_background_color(arcade.color.BLACK)
@@ -45,11 +47,81 @@ class TutorialWindow(arcade.Window):
         self.all_sprites.append(asteroid)
 
     def on_update(self, delta_time: float):
+
+        if self.paused or not self.alive:
+            return
+
+        if (
+            self.player.collides_with_list(self.enemies_list)
+            or self.player.collides_with_list(self.asteroids_list)
+        ):
+            self.alive = False
+            
+
         self.all_sprites.update()
+
+        if self.player.top > self.height:
+            self.player.top = self.height
+        if self.player.right > self.width:
+            self.player.right = self.width
+        if self.player.bottom < 0:
+            self.player.bottom = 0
+        if self.player.left < 0:
+            self.player.left = 0
+
+        self.score += delta_time
 
     def on_draw(self):
         arcade.start_render()
         self.all_sprites.draw()
+        
+        # Draw our score on the screen, scrolling it with the viewport
+        score_text = f"Score: {int(self.score * 100) / 100}"
+        arcade.draw_text(score_text, 10, 10,
+                         arcade.csscolor.WHITE, 18)
+        
+        if not self.alive:
+            arcade.draw_text('YOU DIED', 10, HEIGHT - 82,
+                            arcade.csscolor.WHITE, 72)
+
+    def on_key_press(self, symbol, modifiers):
+        speed = 5
+        if symbol == arcade.key.Q:
+            # Quit immediately
+            arcade.close_window()
+
+        if symbol == arcade.key.P:
+            self.paused = not self.paused
+
+        if symbol == arcade.key.I or symbol == arcade.key.UP:
+            self.player.change_y = speed
+
+        if symbol == arcade.key.K or symbol == arcade.key.DOWN:
+            self.player.change_y = -1 * speed
+
+        if symbol == arcade.key.J or symbol == arcade.key.LEFT:
+            self.player.change_x = -1 * speed
+
+        if symbol == arcade.key.L or symbol == arcade.key.RIGHT:
+            self.player.change_x = speed
+
+    def on_key_release(self, symbol: int, modifiers: int):
+
+        if (
+            symbol == arcade.key.I
+            or symbol == arcade.key.K
+            or symbol == arcade.key.UP
+            or symbol == arcade.key.DOWN
+        ):
+            self.player.change_y = 0
+
+        if (
+            symbol == arcade.key.J
+            or symbol == arcade.key.L
+            or symbol == arcade.key.LEFT
+            or symbol == arcade.key.RIGHT
+        ):
+            self.player.change_x = 0
 
 class FlyingSprite(arcade.Sprite):
 
